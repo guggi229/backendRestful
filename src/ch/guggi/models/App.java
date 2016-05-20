@@ -26,13 +26,6 @@ public class App implements Comparable<App>{
 	@Column(name="appID", nullable=false)
 	private Integer appID;
 	
-	public Integer getAppID() {
-		return appID;
-	}
-	public void setAppID(Integer appID) {
-		this.appID = appID;
-	}
-
 	@Column(name="appName")
 	private String appName;
 	
@@ -55,7 +48,14 @@ public class App implements Comparable<App>{
 		this.appName = appName;
 	}
 	
-
+	public Integer getAppID() {
+		return appID;
+	}
+	public void setAppID(Integer appID) {
+		this.appID = appID;
+	}
+	
+	
 	// Hibernate needs a default constructor
 	public App(){
 		

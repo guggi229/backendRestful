@@ -19,5 +19,6 @@
 
 		<mapping class="ch.guggi.models.App" />
 		<mapping class="ch.guggi.models.User" />
+		<mapping class="ch.guggi.models.Rating" />
 	</session-factory>
 </hibernate-configuration>
