@@ -196,7 +196,7 @@ public class Restful {
 		
 		app.setAppID(7);
 		app.setAppName("guggiapp");
-		app.setAppScore(93);
+		
 		
 		Rating rating = new Rating();
 		rating.setRatingID(2);
@@ -312,7 +312,7 @@ public class Restful {
 		try {
 			tx = session.beginTransaction();
 			app = (App) session.load(App.class, tmp.getAppID());
-			app.setAppScore(tmp.getAppScore()+app.getAppScore());
+			
 			session.save(app);
 			tx.commit();
 		}
@@ -340,14 +340,10 @@ public class Restful {
 		List<App> apps = session.createQuery("FROM App").list();
 		session.close();
 		System.out.println("Unsortiert: ");
-		for (App app : apps) {
-			System.out.println(app.getAppScore());
-		}
+		
 		Collections.sort(apps,Collections.reverseOrder());
 		System.out.println("Sortiert: ");
-		for (App app : apps) {
-			System.out.println(app.getAppScore());
-		}
+		
 		String json = gson.toJson(apps);
 		return json;
 	}
@@ -410,34 +406,36 @@ public class Restful {
 	@Path("/user")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateUser(User user){
+	public Response updateUser(UpdateUser updateUser){
 		Session sess = HibernateUtil.getSessionFactory().openSession();
 		
 		
+		User user = (User) sess.get(User.class, updateUser.getUserID());
+		user.setUserName(updateUser.getUserName());
+		//user.set
 		
-		Query query = sess.getNamedQuery("findUserByName");
-		query.setString("custName", user.getUserName());
 		
 		
-		int size = query.list().size();
-		System.out.println("user with name: " + user.getUserName() + " exists " + size + "  times");
-		if (size == 0) {
-			org.hibernate.Transaction tx;
-			try {
-				tx = sess.beginTransaction();
-				sess.save(user);
-				tx.commit();
-				return Response.status(201).entity("{\"ok\":\"User wurde eingefügt\"}").build();
-			}
-			catch (Exception e) {
-				System.out.println(e);
-				return Response.status(201).entity("{\"status\":\"failed\"}").build();
-			}
-			finally {
-				sess.close();
-			}
+		
+//		int size = query.list().size();
+//		System.out.println("user with name: " + user.getUserName() + " exists " + size + "  times");
+//		if (size == 0) {
+//			org.hibernate.Transaction tx;
+//			try {
+//				tx = sess.beginTransaction();
+//				sess.save(user);
+//				tx.commit();
+//				return Response.status(201).entity("{\"ok\":\"User wurde eingefügt\"}").build();
+//			}
+//			catch (Exception e) {
+//				System.out.println(e);
+//				return Response.status(201).entity("{\"status\":\"failed\"}").build();
+//			}
+//			finally {
+//				sess.close();
+//			}
 			
-		}
+		//}
 		return Response.status(201).entity("{\"ok\":\"User wurde eingefügt\"}").build();
 	}
 

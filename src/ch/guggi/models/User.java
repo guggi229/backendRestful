@@ -45,6 +45,9 @@ public class User {
 	@Column(name="UserName")
 	private String userName;
 
+	@Column(name="AppID")
+	private String appID;
+	
 	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, mappedBy="user")
 	private Set<Rating> ratings;
@@ -55,10 +58,24 @@ public class User {
 	 * 
 	 */
 	
+	
+	
 	public Integer getUserID() {
 		return userID;
 	}
 	
+	public String getAppID() {
+		return appID;
+	}
+
+	public void setAppID(String appID) {
+		this.appID = appID;
+	}
+
+	public void setRatings(Set<Rating> ratings) {
+		this.ratings = ratings;
+	}
+
 	public void setUserID(Integer userID) {
 		this.userID = userID;
 	}
