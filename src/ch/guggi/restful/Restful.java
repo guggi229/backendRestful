@@ -37,8 +37,8 @@ import ch.guggi.services.SessionFactoryService;
 @Path("/Restful")
 public class Restful {
 
-	
-	
+
+
 	static HashMap<Integer, App> apps =
 			new HashMap<Integer, App>();
 	private List<App> appList = new ArrayList<App>();
@@ -60,7 +60,7 @@ public class Restful {
 	 * URL: http://localhost:8080/RatingAppF/rest/Restful/app
 	 * 
 	 */
-	
+
 
 	@POST
 	@Path("/app")
@@ -83,7 +83,7 @@ public class Restful {
 		}
 		return Response.status(201).entity("{\"status\":\"ok\"}").build();
 	}
-	
+
 	@POST
 	@Path("/app2")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -187,48 +187,48 @@ public class Restful {
 		session.close();
 		return json;
 	}
-	
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("appTest")
 	public List<App> getApp() {
 		App app = new App();
-		
+
 		app.setAppID(7);
 		app.setAppName("guggiapp");
-		
-		
+
+
 		Rating rating = new Rating();
 		rating.setRatingID(2);
 		rating.setRatingNegComment("neg");
 		rating.setRatingPosComment("pos");
 		rating.setRatingScore(93);
-		
+
 		User user = new User();
 		user.setUserID(1);
 		user.setUserName("stefan");
-		
+
 		rating.setUser(user);
-		
+
 		Set<Rating> ratings = new HashSet<Rating>();
 		ratings.add(rating);
-		
+
 		app.setRatings(ratings);
-		
+
 		List<App> apps = new ArrayList<App>();
 		apps.add(app);
 		apps.add(app);
-		
+
 		return apps;
 	}
-	
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("apps")
 	public List<App> getApps() {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		List<App>  apps = session.createCriteria(App.class).list();
-		
+
 		for (App a: apps) {
 			System.out.println("ID: " + a.getAppID());
 			for (Rating r: a.getRatings()) {
@@ -237,10 +237,10 @@ public class Restful {
 			}
 			System.out.println("amount of ratings: " + a.getRatings().size());
 		}
-		
+
 		return apps;
 	}
-	
+
 	/***********************************************************************************************
 	 * 
 	 * 
@@ -248,7 +248,7 @@ public class Restful {
 	 * 
 	 * 
 	 ************************************************************************************************/
-	
+
 	/*
 	 * Speichert eine neues Rating
 	 * 
@@ -264,22 +264,22 @@ public class Restful {
 		org.hibernate.Transaction tx;
 		try {
 			tx = session.beginTransaction();
-			
+
 			Session sess = HibernateUtil.getSessionFactory().openSession();
-            User user =  (User) sess.get(User.class, rr.getUserId());
-            
-            System.out.println("User: " + user.getUserID());
-			
+			User user =  (User) sess.get(User.class, rr.getUserId());
+
+			System.out.println("User: " + user.getUserID());
+
 			App app = (App) sess.get(App.class, rr.getAppId());
-			
+
 			System.out.println("App: " + app.getAppID());
-			
+
 			Rating rating = new Rating();
 			rating.setUser(user);
 			rating.setApp(app);
 			rating.setRatingPosComment("Super");
 			rating.setRatingScore(100);
-			
+
 			session.save(rating);
 			tx.commit();
 		}
@@ -292,7 +292,7 @@ public class Restful {
 		}
 		return Response.status(201).entity(" erstellt").build();
 	}
-	
+
 	/*
 	 * Speichert die Punktzahlen. Erwartet wir die App ID im Request
 	 * 
@@ -312,7 +312,7 @@ public class Restful {
 		try {
 			tx = session.beginTransaction();
 			app = (App) session.load(App.class, tmp.getAppID());
-			
+
 			session.save(app);
 			tx.commit();
 		}
@@ -340,10 +340,10 @@ public class Restful {
 		List<App> apps = session.createQuery("FROM App").list();
 		session.close();
 		System.out.println("Unsortiert: ");
-		
+
 		Collections.sort(apps,Collections.reverseOrder());
 		System.out.println("Sortiert: ");
-		
+
 		String json = gson.toJson(apps);
 		return json;
 	}
@@ -363,7 +363,7 @@ public class Restful {
 	 * 
 	 * *********************************************************************************************
 	 */
-	
+
 	/*
 	 * Speichert eine neue User
 	 * 
@@ -372,13 +372,13 @@ public class Restful {
 	 * URL: http://localhost:8080/RatingAppF/rest/Restful/user
 	 * {"userName":"Stefan"}
 	 */
-	
+
 	@POST
 	@Path("/user")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createUser(User user){
-		
+
 		Session sess = HibernateUtil.getSessionFactory().openSession();
 		Query query = sess.getNamedQuery("findUserByName");
 		query.setString("custName", user.getUserName());
@@ -409,21 +409,22 @@ public class Restful {
 	public Response updateUser(UpdateUser updateUser){
 		Session sess = HibernateUtil.getSessionFactory().openSession();
 		org.hibernate.Transaction tx;
-		User user = (User) sess.get(User.class, updateUser.getUserID());
-		user.setUserName(updateUser.getUserName());
-		user.getApp().setAppID(updateUser.getAppID());
-			
-		try {
-			tx = sess.beginTransaction();
-			sess.save(user);
-			tx.commit();
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-		
-		
-		
 	
+			User user = (User) sess.get(User.class, updateUser.getUserID());
+			user.setUserName(updateUser.getUserName());
+			if (updateUser.getAppID()!=null){
+				System.out.println("appID ist " + updateUser.getAppID());
+				App app = (App) sess.get(App.class, updateUser.getAppID());
+				user.setApp(app);
+			}
+			tx = sess.beginTransaction();
+			try {
+				sess.save(user);
+				tx.commit();
+		} catch (Exception e) {
+				System.out.println(e);
+				return Response.status(500).entity("{\"failed\":\"unknown!\"}").build();
+		}
 		return Response.status(201).entity("{\"ok\":\"Updated!\"}").build();
 	}
 
@@ -444,8 +445,8 @@ public class Restful {
 		test.setBar("bar");
 		return test;
 	}
-	
-	
+
+
 	@GET // Test Connection
 	@Produces(MediaType.TEXT_PLAIN)
 	@Path("say")
