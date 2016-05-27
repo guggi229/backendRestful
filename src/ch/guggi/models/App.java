@@ -27,7 +27,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Entity
 @SequenceGenerator(name="appID", initialValue=1, allocationSize=1)
 @Table(name="App")
-public class App implements Comparable<App>{
+public class App {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
@@ -37,21 +37,21 @@ public class App implements Comparable<App>{
 	@Column(name="appName")
 	private String appName;
 	
-	@Column(name="appScore")
-	private Integer appScore;
+//	@Column(name="appScore")
+//	private Integer appScore;
 	
 	@OneToMany(fetch = FetchType.EAGER, mappedBy="app")
 	private Set<Rating> ratings;
 	
 	// Getter Setters
 	
-	public Integer getAppScore() {
-		return appScore;
-	}
-	
-	public void setAppScore(Integer appScore) {
-		this.appScore = appScore;
-	}
+//	public Integer getAppScore() {
+//		return appScore;
+//	}
+//	
+//	public void setAppScore(Integer appScore) {
+//		this.appScore = appScore;
+//	}
 	
 	public String getAppName() {
 		return appName;
@@ -85,10 +85,10 @@ public class App implements Comparable<App>{
  * Standard comparableTo.......
  * 
  */
-	@Override
-	public int compareTo(App o) {
-		if (o.getAppScore()== null || this.getAppScore()==null) return -1;
-		return this.appScore.compareTo(o.appScore);
-	}
+//	@Override
+//	public int compareTo(App o) {
+//		if (o.getAppScore()== null || this.getAppScore()==null) return -1;
+//		return this.appScore.compareTo(o.appScore);
+//	}
 	
 }
