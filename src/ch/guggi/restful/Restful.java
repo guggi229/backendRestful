@@ -61,7 +61,7 @@ public class Restful {
 	 * 
 	 */
 
-
+//  Obsolete
 	@POST
 	@Path("/app")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -83,7 +83,7 @@ public class Restful {
 		}
 		return Response.status(201).entity("{\"status\":\"ok\"}").build();
 	}
-
+//Obsolete
 	@POST
 	@Path("/app2")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -105,6 +105,36 @@ public class Restful {
 		}
 		return app;
 	}
+	
+//	@POST
+//	@Path("/app3")
+//	@Consumes(MediaType.APPLICATION_JSON)
+//	@Produces(MediaType.APPLICATION_JSON)
+//	public Response createApp3(App app){
+//
+//		Session sess = HibernateUtil.getSessionFactory().openSession();
+//		Query query = sess.getNamedQuery("findAppByName");
+//		query.setString("custName", app.getAppName());
+//		int size = query.list().size();
+//		System.out.println("app with name: " + app.getAppName() + " exists " + size + "  times");
+//		if (size == 0) {
+//			org.hibernate.Transaction tx;
+//			try {
+//				tx = sess.beginTransaction();
+//				sess.save(app);
+//				tx.commit();
+//				return Response.status(201).entity("{\"ok\":\"App wurde eingefügt\"}").build();
+//			}
+//			catch (Exception e) {
+//				System.out.println(e);
+//				return Response.status(201).entity("{\"status\":\"failed\"}").build();
+//			}
+//			finally {
+//				sess.close();
+//			}
+//		}
+//		else return Response.status(404).entity("{\"failed\":\"App bereits vorhanden\"}").build();
+//	}
 
 	/*
 	 * Updated die App. Erwartet wir die App ID im Request
@@ -112,7 +142,7 @@ public class Restful {
 	 * Beispiel: {   "appID": 22, "appScore":5}
 	 * URL: http://localhost:8080/RatingAppF/rest/Restful/app
 	 */
-
+// obsolete
 	@PUT
 	@Path("/app")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -137,6 +167,26 @@ public class Restful {
 		}
 		return Response.status(200).entity("{\"status\":\"ok\"}").build();
 	}
+	
+//	@PUT
+//	@Path("/app3")
+//	@Consumes(MediaType.APPLICATION_JSON)
+//	@Produces(MediaType.APPLICATION_JSON)
+//	public Response updateApp3(App updateApp ){
+//		Session sess = HibernateUtil.getSessionFactory().openSession();
+//		org.hibernate.Transaction tx;
+//			App app = (App) sess.get(App.class, updateApp.getAppID());
+//			app.setAppName(updateApp.getAppName());
+//			tx = sess.beginTransaction();
+//			try {
+//				sess.save(app);
+//				tx.commit();
+//		} catch (Exception e) {
+//				System.out.println(e);
+//				return Response.status(500).entity("{\"failed\":\"unknown!\"}").build();
+//		}
+//		return Response.status(201).entity("{\"ok\":\"Updated!\"}").build();
+//	}
 	/*
 	 * Deleted eine neue APP
 	 * 
@@ -188,39 +238,7 @@ public class Restful {
 		return json;
 	}
 
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("appTest")
-	public List<App> getApp() {
-		App app = new App();
-
-		app.setAppID(7);
-		app.setAppName("guggiapp");
-
-
-		Rating rating = new Rating();
-		rating.setRatingID(2);
-		rating.setRatingNegComment("neg");
-		rating.setRatingPosComment("pos");
-		rating.setRatingScore(93);
-
-		User user = new User();
-		user.setUserID(1);
-		user.setUserName("stefan");
-
-		rating.setUser(user);
-
-		Set<Rating> ratings = new HashSet<Rating>();
-		ratings.add(rating);
-
-		app.setRatings(ratings);
-
-		List<App> apps = new ArrayList<App>();
-		apps.add(app);
-		apps.add(app);
-
-		return apps;
-	}
+	
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -390,7 +408,7 @@ public class Restful {
 				tx = sess.beginTransaction();
 				sess.save(user);
 				tx.commit();
-				return Response.status(201).entity("{\"ok\":\"User wurde eingefügt\"}").build();
+				return Response.status(201).entity("{\"userId\":" +user.getUserID() +",\"status\":\"ok\"}").build();
 			}
 			catch (Exception e) {
 				System.out.println(e);
@@ -400,7 +418,7 @@ public class Restful {
 				sess.close();
 			}
 		}
-		else return Response.status(404).entity("{\"failed\":\"User bereits vorhanden\"}").build();
+		else return Response.status(404).entity("{\"status\":\"failed\"}").build();
 	}
 	@PUT
 	@Path("/user")
@@ -452,6 +470,40 @@ public class Restful {
 	@Path("say")
 	public String say() {
 		return "Hello World RESTful Jersey!";
+	}
+	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("appTest")
+	public List<App> getApp() {
+		App app = new App();
+
+		app.setAppID(7);
+		app.setAppName("guggiapp");
+
+
+		Rating rating = new Rating();
+		rating.setRatingID(2);
+		rating.setRatingNegComment("neg");
+		rating.setRatingPosComment("pos");
+		rating.setRatingScore(93);
+
+		User user = new User();
+		user.setUserID(1);
+		user.setUserName("stefan");
+
+		rating.setUser(user);
+
+		Set<Rating> ratings = new HashSet<Rating>();
+		ratings.add(rating);
+
+		app.setRatings(ratings);
+
+		List<App> apps = new ArrayList<App>();
+		apps.add(app);
+		apps.add(app);
+
+		return apps;
 	}
 
 }
