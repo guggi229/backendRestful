@@ -61,132 +61,105 @@ public class Restful {
 	 * 
 	 */
 
-//  Obsolete
+
+	//	@POST
+	//	@Path("/app")
+	//	@Consumes(MediaType.APPLICATION_JSON)
+	//	@Produces(MediaType.APPLICATION_JSON)
+	//	public Response createApp(App app){
+	//		Session session = SessionFactoryService.getSessionFactory().openSession();
+	//		org.hibernate.Transaction tx;
+	//		try {
+	//			tx = session.beginTransaction();
+	//			session.save(app);
+	//			tx.commit();
+	//		}
+	//		catch (Exception e) {
+	//			System.out.println(e);
+	//			return Response.status(201).entity("{\"status\":\"failed\"}").build();
+	//		}
+	//		finally {
+	//			session.close();
+	//		}
+	//		return Response.status(201).entity("{\"status\":\"ok\"}").build();
+	//	}
 	@POST
 	@Path("/app")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createApp(App app){
-		Session session = SessionFactoryService.getSessionFactory().openSession();
+	public Response createUser(App app){
+		Session sess = HibernateUtil.getSessionFactory().openSession();
 		org.hibernate.Transaction tx;
 		try {
-			tx = session.beginTransaction();
-			session.save(app);
+			tx = sess.beginTransaction();
+			sess.save(app);
 			tx.commit();
+			return Response.status(201).entity("{\"status\":\"ok\"}").build();
 		}
 		catch (Exception e) {
 			System.out.println(e);
 			return Response.status(201).entity("{\"status\":\"failed\"}").build();
 		}
 		finally {
-			session.close();
+			sess.close();
 		}
-		return Response.status(201).entity("{\"status\":\"ok\"}").build();
 	}
-//Obsolete
-	@POST
-	@Path("/app2")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public App createApp2(App app){
-		Session session = SessionFactoryService.getSessionFactory().openSession();
-		org.hibernate.Transaction tx;
-		try {
-			tx = session.beginTransaction();
-			session.save(app);
-			tx.commit();
-		}
-		catch (Exception e) {
-			System.out.println(e);
-			return app;
-		}
-		finally {
-			session.close();
-		}
-		return app;
-	}
-	
-//	@POST
-//	@Path("/app3")
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response createApp3(App app){
-//
-//		Session sess = HibernateUtil.getSessionFactory().openSession();
-//		Query query = sess.getNamedQuery("findAppByName");
-//		query.setString("custName", app.getAppName());
-//		int size = query.list().size();
-//		System.out.println("app with name: " + app.getAppName() + " exists " + size + "  times");
-//		if (size == 0) {
-//			org.hibernate.Transaction tx;
-//			try {
-//				tx = sess.beginTransaction();
-//				sess.save(app);
-//				tx.commit();
-//				return Response.status(201).entity("{\"ok\":\"App wurde eingefügt\"}").build();
-//			}
-//			catch (Exception e) {
-//				System.out.println(e);
-//				return Response.status(201).entity("{\"status\":\"failed\"}").build();
-//			}
-//			finally {
-//				sess.close();
-//			}
-//		}
-//		else return Response.status(404).entity("{\"failed\":\"App bereits vorhanden\"}").build();
-//	}
+
+
 
 	/*
 	 * Updated die App. Erwartet wir die App ID im Request
 	 * 
-	 * Beispiel: {   "appID": 22, "appScore":5}
+	 * Beispiel: {   "appID": 22, "appName":5}
 	 * URL: http://localhost:8080/RatingAppF/rest/Restful/app
 	 */
-// obsolete
+//	@PUT
+//	@Path("/app")
+//	@Consumes(MediaType.APPLICATION_JSON)
+//	@Produces(MediaType.APPLICATION_JSON)
+//	public Response updateApp(App tmp){
+//		App app;
+//		Session session = SessionFactoryService.getSessionFactory().openSession();
+//		org.hibernate.Transaction tx;
+//		try {
+//			tx = session.beginTransaction();
+//			app = (App) session.load(App.class, tmp.getAppId());
+//			app = tmp;
+//			System.out.println("Name: " + app.getAppName());
+//			session.update(app);
+//			tx.commit();
+//		}
+//		catch (Exception e) {
+//			System.out.println(e);
+//			return Response.status(500).entity("{\"failed\":\"unknown!\"}").build();
+//		}
+//		finally {
+//			session.close();
+//		}
+//		return Response.status(200).entity("{\"status\":\"ok\"}").build();
+//	}
 	@PUT
 	@Path("/app")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateApp(App tmp){
-		App app;
-		Session session = SessionFactoryService.getSessionFactory().openSession();
+	// uNIQUE!!!!!!!!!!!!!!!!!
+	public Response App(App tmp){
+		Session sess = HibernateUtil.getSessionFactory().openSession();
 		org.hibernate.Transaction tx;
+		App app = (App) sess.load(App.class, tmp.getAppId());
+		
+		app.setAppName(tmp.getAppName());
+		tx = sess.beginTransaction();
 		try {
-			tx = session.beginTransaction();
-			app = (App) session.load(App.class, tmp.getAppID());
-			app = tmp;
-			System.out.println("Name: " + app.getAppName());
-			session.update(app);
+			sess.save(app);
 			tx.commit();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			System.out.println(e);
-		}
-		finally {
-			session.close();
+			return Response.status(500).entity("{\"failed\":\"unknown!\"}").build();
 		}
 		return Response.status(200).entity("{\"status\":\"ok\"}").build();
 	}
-	
-//	@PUT
-//	@Path("/app3")
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response updateApp3(App updateApp ){
-//		Session sess = HibernateUtil.getSessionFactory().openSession();
-//		org.hibernate.Transaction tx;
-//			App app = (App) sess.get(App.class, updateApp.getAppID());
-//			app.setAppName(updateApp.getAppName());
-//			tx = sess.beginTransaction();
-//			try {
-//				sess.save(app);
-//				tx.commit();
-//		} catch (Exception e) {
-//				System.out.println(e);
-//				return Response.status(500).entity("{\"failed\":\"unknown!\"}").build();
-//		}
-//		return Response.status(201).entity("{\"ok\":\"Updated!\"}").build();
-//	}
+
 	/*
 	 * Deleted eine neue APP
 	 * 
@@ -198,20 +171,16 @@ public class Restful {
 	@Path("/app")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response delApp(App app){
-		Session session = SessionFactoryService.getSessionFactory().openSession();
+	public Response DelApp(App tmp){
+		Session sess = HibernateUtil.getSessionFactory().openSession();
 		org.hibernate.Transaction tx;
+		tx = sess.beginTransaction();
 		try {
-			tx = session.beginTransaction();
-			session.delete(app);
+			sess.delete(tmp);
 			tx.commit();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			System.out.println(e);
-			return Response.status(404).entity("{\"status\":\"failed\"}").build();
-		}
-		finally {
-			session.close();
+			return Response.status(500).entity("{\"failed\":\"unknown!\"}").build();
 		}
 		return Response.status(200).entity("{\"status\":\"ok\"}").build();
 	}
@@ -238,17 +207,34 @@ public class Restful {
 		return json;
 	}
 
-	
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("apps")
+	@Path("apps2")
 	public List<App> getApps() {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		List<App>  apps = session.createCriteria(App.class).list();
 
 		for (App a: apps) {
-			System.out.println("ID: " + a.getAppID());
+			System.out.println("ID: " + a.getAppId());
+			for (Rating r: a.getRatings()) {
+				System.out.println("rating id: " + r.getRatingID());
+				System.out.println("user: " + r.getUser());
+			}
+			System.out.println("amount of ratings: " + a.getRatings().size());
+		}
+
+		return apps;
+	}
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("apps5")
+	public List<App> getApps2() {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<App>  apps = session.createCriteria(App.class).list();
+
+		for (App a: apps) {
+			System.out.println("ID: " + a.getAppId());
 			for (Rating r: a.getRatings()) {
 				System.out.println("rating id: " + r.getRatingID());
 				System.out.println("user: " + r.getUser());
@@ -290,7 +276,7 @@ public class Restful {
 
 			App app = (App) sess.get(App.class, rr.getAppId());
 
-			System.out.println("App: " + app.getAppID());
+			System.out.println("App: " + app.getAppId());
 
 			Rating rating = new Rating();
 			rating.setUser(user);
@@ -329,7 +315,7 @@ public class Restful {
 		org.hibernate.Transaction tx;
 		try {
 			tx = session.beginTransaction();
-			app = (App) session.load(App.class, tmp.getAppID());
+			app = (App) session.load(App.class, tmp.getAppId());
 
 			session.save(app);
 			tx.commit();
@@ -356,6 +342,8 @@ public class Restful {
 		Gson gson = new Gson();
 		Session session = SessionFactoryService.getSessionFactory().openSession();
 		List<App> apps = session.createQuery("FROM App").list();
+		
+	
 		session.close();
 		System.out.println("Unsortiert: ");
 
@@ -427,21 +415,21 @@ public class Restful {
 	public Response updateUser(UpdateUser updateUser){
 		Session sess = HibernateUtil.getSessionFactory().openSession();
 		org.hibernate.Transaction tx;
-	
-			User user = (User) sess.get(User.class, updateUser.getUserID());
-			user.setUserName(updateUser.getUserName());
-			if (updateUser.getAppID()!=null){
-				System.out.println("appID ist " + updateUser.getAppID());
-				App app = (App) sess.get(App.class, updateUser.getAppID());
-				user.setApp(app);
-			}
-			tx = sess.beginTransaction();
-			try {
-				sess.save(user);
-				tx.commit();
+
+		User user = (User) sess.get(User.class, updateUser.getUserID());
+		user.setUserName(updateUser.getUserName());
+		if (updateUser.getAppID()!=null){
+			System.out.println("appID ist " + updateUser.getAppID());
+			App app = (App) sess.get(App.class, updateUser.getAppID());
+			user.setApp(app);
+		}
+		tx = sess.beginTransaction();
+		try {
+			sess.save(user);
+			tx.commit();
 		} catch (Exception e) {
-				System.out.println(e);
-				return Response.status(500).entity("{\"failed\":\"unknown!\"}").build();
+			System.out.println(e);
+			return Response.status(500).entity("{\"failed\":\"unknown!\"}").build();
 		}
 		return Response.status(201).entity("{\"ok\":\"Updated!\"}").build();
 	}
@@ -471,39 +459,27 @@ public class Restful {
 	public String say() {
 		return "Hello World RESTful Jersey!";
 	}
-	
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("appTest")
-	public List<App> getApp() {
-		App app = new App();
+	@Path("apps")
+	public Set<RatedApp> getRatedApps() {
+		RatedApp myApp = new RatedApp();
+		myApp.setAppId(80);
+		myApp.setAppName("Stefan");
+		myApp.setNumberOfRatings(1);
+		myApp.setRatingAvg(4.5);
+		RatedApp myApp2 = new RatedApp();
+		myApp2.setAppId(77);
+		myApp2.setAppName("Patrick");
+		myApp2.setNumberOfRatings(1);
+		myApp2.setRatingAvg(4.5);
+		Set<RatedApp> ratedApp = new HashSet<RatedApp>();
+		ratedApp.add(myApp);
+		ratedApp.add(myApp2);
+			
 
-		app.setAppID(7);
-		app.setAppName("guggiapp");
-
-
-		Rating rating = new Rating();
-		rating.setRatingID(2);
-		rating.setRatingNegComment("neg");
-		rating.setRatingPosComment("pos");
-		rating.setRatingScore(93);
-
-		User user = new User();
-		user.setUserID(1);
-		user.setUserName("stefan");
-
-		rating.setUser(user);
-
-		Set<Rating> ratings = new HashSet<Rating>();
-		ratings.add(rating);
-
-		app.setRatings(ratings);
-
-		List<App> apps = new ArrayList<App>();
-		apps.add(app);
-		apps.add(app);
-
-		return apps;
+		return ratedApp;
 	}
 
 }

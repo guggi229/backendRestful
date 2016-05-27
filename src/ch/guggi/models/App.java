@@ -9,10 +9,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.transaction.Transactional;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -26,21 +30,17 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @XmlRootElement
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @Entity
-
-@SequenceGenerator(name="appID", initialValue=1, allocationSize=1)
+@SequenceGenerator(name="appId", initialValue=1, allocationSize=1)
 @Table(name="App")
 public class App {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Column(name="appID", nullable=false)
-	private Integer appID;
+	@Column(name="appId", nullable=false)
+	private Integer appId;
 	
 	@Column(name="appName")
 	private String appName;
-	
-//	@Column(name="appScore")
-//	private Integer appScore;
 	
 	@OneToMany(fetch = FetchType.EAGER, mappedBy="app")
 	private Set<Rating> ratings;
@@ -48,16 +48,15 @@ public class App {
 	@OneToMany(fetch = FetchType.EAGER, mappedBy="app")
 	private Set<User> users;
 
+	@Transient
+	private float ratingAVG;
+	
+	@Transient
+	private Integer numberOfRatings;
+	
 	
 	// Getter Setters
 	
-//	public Integer getAppScore() {
-//		return appScore;
-//	}
-//	
-//	public void setAppScore(Integer appScore) {
-//		this.appScore = appScore;
-//	}
 	
 	public String getAppName() {
 		return appName;
@@ -66,11 +65,11 @@ public class App {
 		this.appName = appName;
 	}
 	
-	public Integer getAppID() {
-		return appID;
+	public Integer getAppId() {
+		return appId;
 	}
-	public void setAppID(Integer appID) {
-		this.appID = appID;
+	public void setAppId(Integer appId) {
+		this.appId = appId;
 	}
 	
 	public Set<Rating> getRatings() {
