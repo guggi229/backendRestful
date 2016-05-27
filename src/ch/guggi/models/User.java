@@ -7,6 +7,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -25,6 +27,12 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @XmlRootElement
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @Entity
+// @NamedQueries({@javax.persistence.NamedQuery(name="findUserByName", query="SELECT u FROM User u WHERE u.userName = :custName"),@javax.persistence.NamedQuery(name="SANDROS_BLOG_ARTIKEL.byAuthor", query="SELECT a FROM DBArticle a WHERE a.m_author = :author")})
+
+@NamedQuery(
+	    name="findUserByName",
+	    query="SELECT u FROM User u WHERE u.userName = :custName"
+	    )
 @SequenceGenerator(name="UserID", initialValue=1, allocationSize=1)
 @Table(name="User")
 public class User {
@@ -38,7 +46,7 @@ public class User {
 	private String userName;
 
 	@JsonIgnore
-	@OneToMany(fetch = FetchType.EAGER, mappedBy="user")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy="user")
 	private Set<Rating> ratings;
 	
 	/*

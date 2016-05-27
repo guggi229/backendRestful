@@ -2,15 +2,12 @@ package ch.guggi.restful;
 
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.transaction.Transaction;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -21,10 +18,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Projections;
-
 import com.google.gson.Gson;
 
 import ch.guggi.models.App;
@@ -42,6 +37,8 @@ import ch.guggi.services.SessionFactoryService;
 @Path("/Restful")
 public class Restful {
 
+	
+	
 	static HashMap<Integer, App> apps =
 			new HashMap<Integer, App>();
 	private List<App> appList = new ArrayList<App>();
@@ -370,35 +367,79 @@ public class Restful {
 	 * 
 	 * *********************************************************************************************
 	 */
+	
 	/*
 	 * Speichert eine neue User
 	 * 
-	 * Test String: {"appName":"Name", "userOwnApp:"bla bla"}
-	 * Hilfe: http://www.journaldev.com/3481/hibernate-save-vs-saveorupdate-vs-persist-vs-merge-vs-update-explanation-with-examples
-	 * URL: 
+	 * Test String: 
+	 * 
+	 * URL: http://localhost:8080/RatingAppF/rest/Restful/user
+	 * {"userName":"Stefan"}
 	 */
-	@POST
-	@Path("/createUser")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response createUser(User user){
-		Session session = SessionFactoryService.getSessionFactory().openSession();
-		org.hibernate.Transaction tx;
-		try {
-			tx = session.beginTransaction();
-			session.save(user);
-			System.out.println("**************************");System.out.println("**************************");System.out.println("**************************");System.out.println("**************************");System.out.println("**************************");System.out.println("**************************");
-			System.out.println(user.getUserName());
-			tx.commit();
-		}
-		catch (Exception e) {
-			System.out.println(e);
-		}
-		finally {
-			session.close();
-		}
-		return Response.status(201).entity(user.getUserName()+" erstellt").build();
-	}
 	
+	@POST
+	@Path("/user")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response createUser(User user){
+		
+		Session sess = HibernateUtil.getSessionFactory().openSession();
+		Query query = sess.getNamedQuery("findUserByName");
+		query.setString("custName", user.getUserName());
+		int size = query.list().size();
+		System.out.println("user with name: " + user.getUserName() + " exists " + size + "  times");
+		if (size == 0) {
+			org.hibernate.Transaction tx;
+			try {
+				tx = sess.beginTransaction();
+				sess.save(user);
+				tx.commit();
+				return Response.status(201).entity("{\"ok\":\"User wurde eingefügt\"}").build();
+			}
+			catch (Exception e) {
+				System.out.println(e);
+				return Response.status(201).entity("{\"status\":\"failed\"}").build();
+			}
+			finally {
+				sess.close();
+			}
+		}
+		else return Response.status(404).entity("{\"failed\":\"User bereits vorhanden\"}").build();
+	}
+	@PUT
+	@Path("/user")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateUser(User user){
+		Session sess = HibernateUtil.getSessionFactory().openSession();
+		
+		
+		
+		Query query = sess.getNamedQuery("findUserByName");
+		query.setString("custName", user.getUserName());
+		
+		
+		int size = query.list().size();
+		System.out.println("user with name: " + user.getUserName() + " exists " + size + "  times");
+		if (size == 0) {
+			org.hibernate.Transaction tx;
+			try {
+				tx = sess.beginTransaction();
+				sess.save(user);
+				tx.commit();
+				return Response.status(201).entity("{\"ok\":\"User wurde eingefügt\"}").build();
+			}
+			catch (Exception e) {
+				System.out.println(e);
+				return Response.status(201).entity("{\"status\":\"failed\"}").build();
+			}
+			finally {
+				sess.close();
+			}
+			
+		}
+		return Response.status(201).entity("{\"ok\":\"User wurde eingefügt\"}").build();
+	}
 
 	/***********************************************************************************************
 	 * 
