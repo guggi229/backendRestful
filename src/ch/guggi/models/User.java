@@ -48,7 +48,7 @@ public class User {
 	private String userName;
 
 	@Column(name="AppID")
-	private String appID;
+	private Integer appID;
 		
 	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, mappedBy="user")
@@ -67,7 +67,6 @@ public class User {
 	 */
 	
 	
-	
 	public App getApp() {
 		return app;
 	}
@@ -80,11 +79,11 @@ public class User {
 		return userID;
 	}
 	
-	public String getAppID() {
+	public Integer getAppID() {
 		return appID;
 	}
 
-	public void setAppID(String appID) {
+	public void setAppID(Integer appID) {
 		this.appID = appID;
 	}
 

@@ -408,35 +408,23 @@ public class Restful {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateUser(UpdateUser updateUser){
 		Session sess = HibernateUtil.getSessionFactory().openSession();
-		
-		
+		org.hibernate.Transaction tx;
 		User user = (User) sess.get(User.class, updateUser.getUserID());
 		user.setUserName(updateUser.getUserName());
-		//user.set
-		
-		
-		
-		
-//		int size = query.list().size();
-//		System.out.println("user with name: " + user.getUserName() + " exists " + size + "  times");
-//		if (size == 0) {
-//			org.hibernate.Transaction tx;
-//			try {
-//				tx = sess.beginTransaction();
-//				sess.save(user);
-//				tx.commit();
-//				return Response.status(201).entity("{\"ok\":\"User wurde eingefügt\"}").build();
-//			}
-//			catch (Exception e) {
-//				System.out.println(e);
-//				return Response.status(201).entity("{\"status\":\"failed\"}").build();
-//			}
-//			finally {
-//				sess.close();
-//			}
+		user.setAppID(updateUser.getAppID());
 			
-		//}
-		return Response.status(201).entity("{\"ok\":\"User wurde eingefügt\"}").build();
+		try {
+			tx = sess.beginTransaction();
+			sess.save(user);
+			tx.commit();
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		
+		
+		
+	
+		return Response.status(201).entity("{\"ok\":\"Updated!\"}").build();
 	}
 
 	/***********************************************************************************************

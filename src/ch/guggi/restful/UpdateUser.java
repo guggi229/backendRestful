@@ -7,6 +7,7 @@ public class UpdateUser {
 	private String userName;
 	private Integer userID;
 	private Integer appID;
+	
 	public String getUserName() {
 		return userName;
 	}
