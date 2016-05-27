@@ -1,13 +1,20 @@
 package ch.guggi.models;
 
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /*
  * Model der App für das OO-Mapping
@@ -16,6 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 
 @XmlRootElement
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @Entity
 @SequenceGenerator(name="appID", initialValue=1, allocationSize=1)
 @Table(name="App")
@@ -32,11 +40,15 @@ public class App implements Comparable<App>{
 	@Column(name="appScore")
 	private Integer appScore;
 	
+	@OneToMany(fetch = FetchType.EAGER, mappedBy="app")
+	private Set<Rating> ratings;
+	
 	// Getter Setters
 	
 	public Integer getAppScore() {
 		return appScore;
 	}
+	
 	public void setAppScore(Integer appScore) {
 		this.appScore = appScore;
 	}
@@ -55,6 +67,13 @@ public class App implements Comparable<App>{
 		this.appID = appID;
 	}
 	
+	public Set<Rating> getRatings() {
+		return this.ratings;
+	}
+	
+	public void setRatings(Set<Rating> ratings) {
+		this.ratings = ratings;
+	}
 	
 	// Hibernate needs a default constructor
 	public App(){

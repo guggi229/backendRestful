@@ -1,12 +1,19 @@
 package ch.guggi.models;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 
 /*
@@ -16,6 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 
 @XmlRootElement
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @Entity
 @SequenceGenerator(name="UserID", initialValue=1, allocationSize=1)
 @Table(name="User")
@@ -28,20 +36,21 @@ public class User {
 	
 	@Column(name="UserName")
 	private String userName;
-	
-	@Column(name="AppID")
-	private String appID;
 
+	@JsonIgnore
+	@OneToMany(fetch = FetchType.EAGER, mappedBy="user")
+	private Set<Rating> ratings;
 	
 	/*
 	 * Getter / Setter
 	 * 
 	 * 
 	 */
+	
 	public Integer getUserID() {
 		return userID;
 	}
-
+	
 	public void setUserID(Integer userID) {
 		this.userID = userID;
 	}
@@ -53,13 +62,13 @@ public class User {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
-
-	public String getUserOwnApp() {
-		return appID;
+	
+	public Set<Rating> getRatings() {
+		return this.ratings;
 	}
-
-	public void setUserOwnApp(String userOwnApp) {
-		this.appID = userOwnApp;
+	
+	public void setRating(Set<Rating> ratings) {
+		this.ratings = ratings;
 	}
 	
 }

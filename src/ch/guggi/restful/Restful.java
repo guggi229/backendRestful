@@ -6,7 +6,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.transaction.Transaction;
 import javax.ws.rs.Consumes;
@@ -26,7 +28,10 @@ import org.hibernate.criterion.Projections;
 import com.google.gson.Gson;
 
 import ch.guggi.models.App;
+import ch.guggi.models.Rating;
+import ch.guggi.models.Test;
 import ch.guggi.models.User;
+import ch.guggi.services.HibernateUtil;
 import ch.guggi.services.SessionFactoryService;
 
 /*
@@ -41,15 +46,15 @@ public class Restful {
 			new HashMap<Integer, App>();
 	private List<App> appList = new ArrayList<App>();
 
-/***********************************************************************************************
- * 
- * 
- * Schnittstelle zum App Model.
- * 
- * 
- ************************************************************************************************/
-	
-		
+	/***********************************************************************************************
+	 * 
+	 * 
+	 * Schnittstelle zum App Model.
+	 * 
+	 * 
+	 ************************************************************************************************/
+
+
 	/*
 	 * Speichert eine neue APP
 	 * 
@@ -79,15 +84,15 @@ public class Restful {
 		}
 		return Response.status(201).entity("{\"status\":\"ok\"}").build();
 	}
-	
-	
+
+
 	/*
 	 * Updated die App. Erwartet wir die App ID im Request
 	 * 
 	 * Beispiel: {   "appID": 22, "appScore":5}
 	 * URL: http://localhost:8080/RatingAppF/rest/Restful/app
 	 */
-	
+
 	@PUT
 	@Path("/app")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -103,7 +108,7 @@ public class Restful {
 			System.out.println("Name: " + app.getAppName());
 			session.update(app);
 			tx.commit();
-			}
+		}
 		catch (Exception e) {
 			System.out.println(e);
 		}
@@ -140,55 +145,6 @@ public class Restful {
 		}
 		return Response.status(200).entity("{\"status\":\"ok\"}").build();
 	}
-	
-		
-
-	/*
-	 * Speichert die Punktzahlen. Erwartet wir die App ID im Request
-	 * 
-	 * Test URL: http://localhost:8080/RatingAppF/rest/Restful/saveScore
-	 * URL: http://group-fitness.ch/RatingAppF/rest/Restful/saveScore
-	 * Beispiel: {   "appID": 22, "appScore":5}
-	 */
-	
-	@PUT
-	@Path("/saveScore")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response saveScore(App tmp){
-		App app;
-		Session session = SessionFactoryService.getSessionFactory().openSession();
-		org.hibernate.Transaction tx;
-		try {
-			tx = session.beginTransaction();
-			app = (App) session.load(App.class, tmp.getAppID());
-			app.setAppScore(tmp.getAppScore()+app.getAppScore());
-			session.save(app);
-			tx.commit();
-			}
-		catch (Exception e) {
-			System.out.println(e);
-		}
-		finally {
-			session.close();
-		}
-		return Response.status(200).entity("{\"status\":\"ok\"}").build();
-	}
-	
-		
-	
-	/*
-	 * Testet die Verbindung (Spielplatz)
-	 * 
-	 * http://localhost:8080/RatingAppF/rest/Restful/say
-	 */
-	@GET // Test Connection
-	@Produces(MediaType.TEXT_PLAIN)
-	@Path("say")
-	public String say() {
-		return "Hello World RESTful Jersey!";
-	}
-
 
 	/*
 	 * Gibt die Liste alle gespeicherten Apps zurück.
@@ -207,11 +163,147 @@ public class Restful {
 		Gson gson = new Gson();
 		Session session = SessionFactoryService.getSessionFactory().openSession();
 		List<App> apps = session.createQuery("FROM App").list();
-		session.close();
 		String json = gson.toJson(apps);
+		session.close();
 		return json;
 	}
+	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("app")
+	public List<App> getApp() {
+		App app = new App();
+		
+		app.setAppID(7);
+		app.setAppName("guggiapp");
+		app.setAppScore(93);
+		
+		Rating rating = new Rating();
+		rating.setRatingID(2);
+		rating.setRatingNegComment("neg");
+		rating.setRatingPosComment("pos");
+		rating.setRatingScore(93);
+		
+		User user = new User();
+		user.setUserID(1);
+		user.setUserName("stefan");
+		
+		rating.setUser(user);
+		
+		Set<Rating> ratings = new HashSet<Rating>();
+		ratings.add(rating);
+		
+		app.setRatings(ratings);
+		
+		List<App> apps = new ArrayList<App>();
+		apps.add(app);
+		apps.add(app);
+		
+		return apps;
+	}
+	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("apps")
+	public List<App> getApps() {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<App>  apps = session.createCriteria(App.class).list();
+		
+		for (App a: apps) {
+			System.out.println("ID: " + a.getAppID());
+			for (Rating r: a.getRatings()) {
+				System.out.println("rating id: " + r.getRatingID());
+				System.out.println("user: " + r.getUser());
+			}
+			System.out.println("amount of ratings: " + a.getRatings().size());
+		}
+		
+		return apps;
+	}
+	
+	/***********************************************************************************************
+	 * 
+	 * 
+	 * Schnittstelle zum Rating Model.
+	 * 
+	 * 
+	 ************************************************************************************************/
+	
+	/*
+	 * Speichert eine neues Rating
+	 * 
+	 * Test String: {"appName":"Name", "userOwnApp:"bla bla"}
+	 * Hilfe: http://www.journaldev.com/3481/hibernate-save-vs-saveorupdate-vs-persist-vs-merge-vs-update-explanation-with-examples
+	 * URL: 
+	 */
+	@POST
+	@Path("/rating")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response createRating(RatingRequest rr){
+		Session session = SessionFactoryService.getSessionFactory().openSession();
+		org.hibernate.Transaction tx;
+		try {
+			tx = session.beginTransaction();
+			
+			Session sess = HibernateUtil.getSessionFactory().openSession();
+            User user =  (User) sess.get(User.class, rr.getUserId());
+            
+            System.out.println("User: " + user.getUserID());
+			
+			App app = (App) sess.get(App.class, rr.getAppId());
+			
+			System.out.println("App: " + app.getAppID());
+			
+			Rating rating = new Rating();
+			rating.setUser(user);
+			rating.setApp(app);
+			rating.setRatingPosComment("Super");
+			rating.setRatingScore(100);
+			
+			session.save(rating);
+			tx.commit();
+		}
+		catch (Exception e) {
+			System.out.println(e);
+		}
+		finally {
+			session.close();
+			System.out.println("ups!");
+		}
+		return Response.status(201).entity(" erstellt").build();
+	}
+	
+	/*
+	 * Speichert die Punktzahlen. Erwartet wir die App ID im Request
+	 * 
+	 * Test URL: http://localhost:8080/RatingAppF/rest/Restful/saveScore
+	 * URL: http://group-fitness.ch/RatingAppF/rest/Restful/saveScore
+	 * Beispiel: {   "appID": 22, "appScore":5}
+	 */
 
+	@PUT
+	@Path("/saveScore")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response saveScore(App tmp){
+		App app;
+		Session session = SessionFactoryService.getSessionFactory().openSession();
+		org.hibernate.Transaction tx;
+		try {
+			tx = session.beginTransaction();
+			app = (App) session.load(App.class, tmp.getAppID());
+			app.setAppScore(tmp.getAppScore()+app.getAppScore());
+			session.save(app);
+			tx.commit();
+		}
+		catch (Exception e) {
+			System.out.println(e);
+		}
+		finally {
+			session.close();
+		}
+		return Response.status(200).entity("{\"status\":\"ok\"}").build();
+	}
 
 	/*
 	 * Liefert eine sortierte Liste mit der besten App am Anfang
@@ -240,7 +332,6 @@ public class Restful {
 		return json;
 	}
 
-
 	public List<App> getAppList() {
 		return appList;
 	}
@@ -248,8 +339,7 @@ public class Restful {
 	public void setAppList(List<App> appList) {
 		this.appList = appList;
 	}
-	
-	
+
 	/***********************************************************************************************
 	 * 
 	 * 
@@ -286,6 +376,31 @@ public class Restful {
 		return Response.status(201).entity(user.getUserName()+" erstellt").build();
 	}
 	
+
+	/***********************************************************************************************
+	 * 
+	 * 
+	 * Test
+	 * 
+	 * http://localhost:8080/RatingAppF/rest/Restful/say
+	 ************************************************************************************************/
+
+	@GET // Test Connection
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("test")
+	public Test test() {
+		Test test = new Test();
+		test.setFoo(7);
+		test.setBar("bar");
+		return test;
+	}
 	
+	
+	@GET // Test Connection
+	@Produces(MediaType.TEXT_PLAIN)
+	@Path("say")
+	public String say() {
+		return "Hello World RESTful Jersey!";
+	}
 
 }
