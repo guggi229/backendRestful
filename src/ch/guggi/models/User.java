@@ -7,6 +7,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -47,10 +49,16 @@ public class User {
 
 	@Column(name="AppID")
 	private String appID;
-	
+		
 	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, mappedBy="user")
 	private Set<Rating> ratings;
+	
+	@JsonIgnore
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "AppID", nullable = true)
+	private App app;
+
 	
 	/*
 	 * Getter / Setter
@@ -60,6 +68,14 @@ public class User {
 	
 	
 	
+	public App getApp() {
+		return app;
+	}
+
+	public void setApp(App app) {
+		this.app = app;
+	}
+
 	public Integer getUserID() {
 		return userID;
 	}

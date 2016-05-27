@@ -43,6 +43,10 @@ public class App {
 	@OneToMany(fetch = FetchType.EAGER, mappedBy="app")
 	private Set<Rating> ratings;
 	
+	@OneToMany(fetch = FetchType.EAGER, mappedBy="app")
+	private Set<User> users;
+
+	
 	// Getter Setters
 	
 //	public Integer getAppScore() {
