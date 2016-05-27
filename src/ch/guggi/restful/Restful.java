@@ -411,7 +411,7 @@ public class Restful {
 		org.hibernate.Transaction tx;
 		User user = (User) sess.get(User.class, updateUser.getUserID());
 		user.setUserName(updateUser.getUserName());
-		user.setAppID(updateUser.getAppID());
+		user.getApp().setAppID(updateUser.getAppID());
 			
 		try {
 			tx = sess.beginTransaction();

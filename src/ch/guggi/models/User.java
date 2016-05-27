@@ -47,8 +47,8 @@ public class User {
 	@Column(name="UserName")
 	private String userName;
 
-	@Column(name="AppID")
-	private Integer appID;
+//	@Column(name="AppID", insert="false" update="false")
+//	private Integer appID;
 		
 	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, mappedBy="user")
@@ -79,13 +79,13 @@ public class User {
 		return userID;
 	}
 	
-	public Integer getAppID() {
-		return appID;
-	}
-
-	public void setAppID(Integer appID) {
-		this.appID = appID;
-	}
+//	public Integer getAppID() {
+//		return appID;
+//	}
+//
+//	public void setAppID(Integer appID) {
+//		this.appID = appID;
+//	}
 
 	public void setRatings(Set<Rating> ratings) {
 		this.ratings = ratings;
