@@ -14,6 +14,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -465,21 +466,33 @@ public class Restful {
 	@Path("apps")
 	public Set<RatedApp> getRatedApps() {
 		RatedApp myApp = new RatedApp();
-		myApp.setAppId(80);
-		myApp.setAppName("Stefan");
+		myApp.setAppId(59);
+		myApp.setAppName("Stefan59");
 		myApp.setNumberOfRatings(1);
 		myApp.setRatingAvg(4.5);
 		RatedApp myApp2 = new RatedApp();
-		myApp2.setAppId(77);
-		myApp2.setAppName("Patrick");
+		myApp2.setAppId(57);
+		myApp2.setAppName("Patrick57");
 		myApp2.setNumberOfRatings(1);
 		myApp2.setRatingAvg(4.5);
 		Set<RatedApp> ratedApp = new HashSet<RatedApp>();
 		ratedApp.add(myApp);
 		ratedApp.add(myApp2);
-			
-
 		return ratedApp;
+	
+	}
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("apps/user/{userId}")
+	public RatedApp getRatedApp(@PathParam("userId") Integer userId) {
+		RatedApp myApp = new RatedApp();
+		myApp.setAppId(userId);
+		myApp.setAppName("Stefan59");
+		myApp.setNumberOfRatings(1);
+		myApp.setRatingAvg(4.5);
+	
+		return myApp;
+	
 	}
 
 }
