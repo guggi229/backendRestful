@@ -63,6 +63,8 @@ public class Restful {
 	 * URL: http://localhost:8080/RatingAppF/rest/Restful/app
 	 * 
 	 */
+	
+
 	@POST
 	@Path("/app")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -84,7 +86,28 @@ public class Restful {
 		}
 		return Response.status(201).entity("{\"status\":\"ok\"}").build();
 	}
-
+	
+	@POST
+	@Path("/app2")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public App createApp2(App app){
+		Session session = SessionFactoryService.getSessionFactory().openSession();
+		org.hibernate.Transaction tx;
+		try {
+			tx = session.beginTransaction();
+			session.save(app);
+			tx.commit();
+		}
+		catch (Exception e) {
+			System.out.println(e);
+			return app;
+		}
+		finally {
+			session.close();
+		}
+		return app;
+	}
 
 	/*
 	 * Updated die App. Erwartet wir die App ID im Request
@@ -170,7 +193,7 @@ public class Restful {
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("app")
+	@Path("appTest")
 	public List<App> getApp() {
 		App app = new App();
 		
