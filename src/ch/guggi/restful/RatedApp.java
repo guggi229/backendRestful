@@ -2,33 +2,34 @@ package ch.guggi.restful;
 
 public class RatedApp {
 
-	private Integer appId;
-	private String appName;
-	private double ratingAvg;
-	private Integer numberOfRatings;
-	public Integer getAppId() {
-		return appId;
+	private Integer userId;
+	private String posComment;
+	private String negComment;
+	private float ratingValue;
+	public Integer getUserId() {
+		return userId;
 	}
-	public void setAppId(Integer appId) {
-		this.appId = appId;
+	public void setUserId(Integer userId) {
+		this.userId = userId;
 	}
-	public String getAppName() {
-		return appName;
+	public String getPosComment() {
+		return posComment;
 	}
-	public void setAppName(String appName) {
-		this.appName = appName;
+	public void setPosComment(String posComment) {
+		this.posComment = posComment;
 	}
-	public double getRatingAvg() {
-		return ratingAvg;
+	public String getNegComment() {
+		return negComment;
 	}
-	public void setRatingAvg(double d) {
-		this.ratingAvg = d;
+	public void setNegComment(String negComment) {
+		this.negComment = negComment;
 	}
-	public Integer getNumberOfRatings() {
-		return numberOfRatings;
+	public float getRatingValue() {
+		return ratingValue;
 	}
-	public void setNumberOfRatings(Integer numberOfRatings) {
-		this.numberOfRatings = numberOfRatings;
+	public void setRatingValue(float ratingValue) {
+		this.ratingValue = ratingValue;
 	}
+	
 	
 }

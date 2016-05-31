@@ -37,9 +37,6 @@ import ch.guggi.services.SessionFactoryService;
 
 @Path("/Restful")
 public class Restful {
-
-
-
 	static HashMap<Integer, App> apps =
 			new HashMap<Integer, App>();
 	private List<App> appList = new ArrayList<App>();
@@ -61,29 +58,7 @@ public class Restful {
 	 * URL: http://localhost:8080/RatingAppF/rest/Restful/app
 	 * 
 	 */
-
-
-	//	@POST
-	//	@Path("/app")
-	//	@Consumes(MediaType.APPLICATION_JSON)
-	//	@Produces(MediaType.APPLICATION_JSON)
-	//	public Response createApp(App app){
-	//		Session session = SessionFactoryService.getSessionFactory().openSession();
-	//		org.hibernate.Transaction tx;
-	//		try {
-	//			tx = session.beginTransaction();
-	//			session.save(app);
-	//			tx.commit();
-	//		}
-	//		catch (Exception e) {
-	//			System.out.println(e);
-	//			return Response.status(201).entity("{\"status\":\"failed\"}").build();
-	//		}
-	//		finally {
-	//			session.close();
-	//		}
-	//		return Response.status(201).entity("{\"status\":\"ok\"}").build();
-	//	}
+	
 	@POST
 	@Path("/app")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -114,31 +89,6 @@ public class Restful {
 	 * Beispiel: {   "appID": 22, "appName":5}
 	 * URL: http://localhost:8080/RatingAppF/rest/Restful/app
 	 */
-//	@PUT
-//	@Path("/app")
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response updateApp(App tmp){
-//		App app;
-//		Session session = SessionFactoryService.getSessionFactory().openSession();
-//		org.hibernate.Transaction tx;
-//		try {
-//			tx = session.beginTransaction();
-//			app = (App) session.load(App.class, tmp.getAppId());
-//			app = tmp;
-//			System.out.println("Name: " + app.getAppName());
-//			session.update(app);
-//			tx.commit();
-//		}
-//		catch (Exception e) {
-//			System.out.println(e);
-//			return Response.status(500).entity("{\"failed\":\"unknown!\"}").build();
-//		}
-//		finally {
-//			session.close();
-//		}
-//		return Response.status(200).entity("{\"status\":\"ok\"}").build();
-//	}
 	@PUT
 	@Path("/app")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -158,15 +108,18 @@ public class Restful {
 			System.out.println(e);
 			return Response.status(500).entity("{\"failed\":\"unknown!\"}").build();
 		}
+		finally {
+			sess.close();
+		}
 		return Response.status(200).entity("{\"status\":\"ok\"}").build();
 	}
 
 	/*
 	 * Deleted eine neue APP
 	 * 
-	 * Hilfe: http://www.journaldev.com/3481/hibernate-save-vs-saveorupdate-vs-persist-vs-merge-vs-update-explanation-with-examples
-	 * URL: 
-	 * 
+	 * URL: 147.87.116.78:8080/RatingAppF/rest/Restful/app
+	 * {"appId": 73}
+	 * Geprüft und ok!
 	 */
 	@DELETE
 	@Path("/app")
@@ -174,14 +127,19 @@ public class Restful {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response DelApp(App tmp){
 		Session sess = HibernateUtil.getSessionFactory().openSession();
+		try {
 		org.hibernate.Transaction tx;
 		tx = sess.beginTransaction();
-		try {
-			sess.delete(tmp);
+		App app = (App) sess.load(App.class, tmp.getAppId());
+		System.out.println("DEL: App geladen");
+			sess.delete(app);
 			tx.commit();
 		} catch (Exception e) {
 			System.out.println(e);
 			return Response.status(500).entity("{\"failed\":\"unknown!\"}").build();
+		}
+		finally {
+			sess.close();
 		}
 		return Response.status(200).entity("{\"status\":\"ok\"}").build();
 	}
@@ -242,7 +200,7 @@ public class Restful {
 			}
 			System.out.println("amount of ratings: " + a.getRatings().size());
 		}
-
+	
 		return apps;
 	}
 
@@ -293,7 +251,7 @@ public class Restful {
 		}
 		finally {
 			session.close();
-			System.out.println("ups!");
+
 		}
 		return Response.status(201).entity(" erstellt").build();
 	}
@@ -432,9 +390,23 @@ public class Restful {
 			System.out.println(e);
 			return Response.status(500).entity("{\"failed\":\"unknown!\"}").build();
 		}
+		finally {
+			sess.close();
+		}
 		return Response.status(201).entity("{\"ok\":\"Updated!\"}").build();
 	}
 
+
+	/***********************************************************************************************
+	 * 
+	 * 
+	 * Rating
+	 * 
+	 * http://localhost:8080/RatingAppF/rest/Restful/say
+	 ************************************************************************************************/
+	
+	
+	
 	/***********************************************************************************************
 	 * 
 	 * 
@@ -464,35 +436,36 @@ public class Restful {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("apps")
-	public Set<RatedApp> getRatedApps() {
-		RatedApp myApp = new RatedApp();
+	public Set<RatedUserApps> getRatedApps() {
+		RatedUserApps myApp = new RatedUserApps();
 		myApp.setAppId(59);
 		myApp.setAppName("Stefan59");
 		myApp.setNumberOfRatings(1);
 		myApp.setRatingAvg(4.5);
-		RatedApp myApp2 = new RatedApp();
+		RatedUserApps myApp2 = new RatedUserApps();
 		myApp2.setAppId(57);
 		myApp2.setAppName("Patrick57");
 		myApp2.setNumberOfRatings(1);
 		myApp2.setRatingAvg(4.5);
-		Set<RatedApp> ratedApp = new HashSet<RatedApp>();
+		Set<RatedUserApps> ratedApp = new HashSet<RatedUserApps>();
 		ratedApp.add(myApp);
 		ratedApp.add(myApp2);
 		return ratedApp;
 	
 	}
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("apps/user/{userId}")
-	public RatedApp getRatedApp(@PathParam("userId") Integer userId) {
-		RatedApp myApp = new RatedApp();
-		myApp.setAppId(userId);
-		myApp.setAppName("Stefan59");
-		myApp.setNumberOfRatings(1);
-		myApp.setRatingAvg(4.5);
-	
-		return myApp;
-	
-	}
+//	@GET
+//	@Produces(MediaType.APPLICATION_JSON)
+//	@Path("ratings/app/{appId}")
+//	public Set<RatedApp> getRatedApp(@PathParam("appId") Integer appId) {
+//		RatedApp myApp = new RatedApp();
+//		myApp.setAppId(appId);
+//		myApp.setAppName("Stefan59");
+//		myApp.setNumberOfRatings(1);
+//		myApp.setRatingAvg(4.5);
+//		
+//		
+//		
+//		return myApps;
+//	}
 
 }
