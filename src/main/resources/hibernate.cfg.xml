@@ -4,7 +4,7 @@
 <hibernate-configuration>
  <session-factory name="">
   <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
-  <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/groupfitness</property>
+  <property name="hibernate.connection.url">jdbc:mysql://147.87.116.78:3306/groupfitness</property>
   <property name="hibernate.connection.username">root</property>
   <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
   <property name="hibernate.connection.password">root</property>
@@ -19,3 +19,5 @@
   <mapping class="ch.guggi.models.Rating"/>
  </session-factory>
 </hibernate-configuration>
+
+

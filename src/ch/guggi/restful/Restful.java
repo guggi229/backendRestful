@@ -217,7 +217,8 @@ public class Restful {
 	 * 
 	 * Test String: {"appName":"Name", "userOwnApp:"bla bla"}
 	 * Hilfe: http://www.journaldev.com/3481/hibernate-save-vs-saveorupdate-vs-persist-vs-merge-vs-update-explanation-with-examples
-	 * URL: 
+	 * URL:147.87.116.78:8080/RatingAppF/rest/Restful/rating
+	 * JSON: {"userId": 4, "appId": 81,  "rating":3, "posComment": "comment xy", "negComment": "comment ab"}
 	 */
 	@POST
 	@Path("/rating")
@@ -227,23 +228,43 @@ public class Restful {
 		org.hibernate.Transaction tx;
 		try {
 			tx = session.beginTransaction();
-
 			Session sess = HibernateUtil.getSessionFactory().openSession();
+			
+			
 			User user =  (User) sess.get(User.class, rr.getUserId());
-
-			System.out.println("User: " + user.getUserID());
-
 			App app = (App) sess.get(App.class, rr.getAppId());
+			
+			Query query = sess.getNamedQuery("findRatingByID");
+			query.setParameter("aID", rr.getAppId());
+			query.setParameter("uID", rr.getUserId());
+			
+			List<Rating> ratings = query.list();
+			
+			int size = ratings.size();
+			System.out.println("Länge: " + size);
+			
+			if (size == 0) {
+				Rating rating = new Rating();
+				rating.setUser(user);
+				rating.setApp(app);
+				rating.setRatingPosComment(rr.getPosComment());
+				rating.setRatingNegComment(rr.getNegComment());
+				rating.setRatingScore(rr.getRating());
+				session.save(rating);
+			} else {
+				Rating rating = ratings.get(0);
+				rating.setRatingNegComment(rr.getNegComment());
+				rating.setRatingPosComment(rr.getPosComment());
+				rating.setRatingScore(rr.getRating());
+				session.update(rating);
+			}
 
-			System.out.println("App: " + app.getAppId());
+		
+			
+			
 
-			Rating rating = new Rating();
-			rating.setUser(user);
-			rating.setApp(app);
-			rating.setRatingPosComment("Super");
-			rating.setRatingScore(100);
-
-			session.save(rating);
+			
+			
 			tx.commit();
 		}
 		catch (Exception e) {

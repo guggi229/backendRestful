@@ -8,6 +8,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQuery;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -16,6 +18,14 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @XmlRootElement
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+
+@NamedQuery(
+	    name="findRatingByID",
+	    query="SELECT r FROM Rating r WHERE r.app.appId = :aID AND r.user.userID= :uID"
+	    )
+
+
+
 @Entity
 @Table(name="Rating")
 public class Rating {
