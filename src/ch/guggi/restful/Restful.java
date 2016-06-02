@@ -258,12 +258,6 @@ public class Restful {
 				rating.setRatingScore(rr.getRating());
 				session.update(rating);
 			}
-
-		
-			
-			
-
-			
 			
 			tx.commit();
 		}
