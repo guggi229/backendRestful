@@ -24,8 +24,6 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 	    query="SELECT r FROM Rating r WHERE r.app.appId = :aID AND r.user.userID= :uID"
 	    )
 
-
-
 @Entity
 @Table(name="Rating")
 public class Rating {

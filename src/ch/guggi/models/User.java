@@ -51,7 +51,7 @@ public class User {
 //	private Integer appID;
 		
 	@JsonIgnore
-	@OneToMany(fetch = FetchType.LAZY, mappedBy="user")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy="user")
 	private Set<Rating> ratings;
 	
 	@JsonIgnore

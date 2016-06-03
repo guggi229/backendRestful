@@ -58,7 +58,7 @@ public class Restful {
 	 * URL: http://localhost:8080/RatingAppF/rest/Restful/app
 	 * 
 	 */
-	
+
 	@POST
 	@Path("/app")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -98,7 +98,7 @@ public class Restful {
 		Session sess = HibernateUtil.getSessionFactory().openSession();
 		org.hibernate.Transaction tx;
 		App app = (App) sess.load(App.class, tmp.getAppId());
-		
+
 		app.setAppName(tmp.getAppName());
 		tx = sess.beginTransaction();
 		try {
@@ -128,10 +128,10 @@ public class Restful {
 	public Response DelApp(App tmp){
 		Session sess = HibernateUtil.getSessionFactory().openSession();
 		try {
-		org.hibernate.Transaction tx;
-		tx = sess.beginTransaction();
-		App app = (App) sess.load(App.class, tmp.getAppId());
-		System.out.println("DEL: App geladen");
+			org.hibernate.Transaction tx;
+			tx = sess.beginTransaction();
+			App app = (App) sess.load(App.class, tmp.getAppId());
+			System.out.println("DEL: App geladen");
 			sess.delete(app);
 			tx.commit();
 		} catch (Exception e) {
@@ -200,9 +200,32 @@ public class Restful {
 			}
 			System.out.println("amount of ratings: " + a.getRatings().size());
 		}
-	
+
 		return apps;
 	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("ratings/app/{appId}")
+	public Set<Rating> getRating(@PathParam("appId") Integer appId) {
+		Session sess = HibernateUtil.getSessionFactory().openSession();
+		//org.hibernate.Transaction tx;
+		//tx = sess.beginTransaction();
+		App myApp = null;
+		Set<Rating> myRatings = null;
+		try {
+	 		myApp = (App) sess.get(App.class, appId);
+	 		myRatings = myApp.getRatings();
+		 //tx.commit();
+		} catch (Exception e) {
+	 		System.out.println(e);
+		}
+		finally {
+			sess.close();
+		}
+		return myRatings;
+	}
+
 
 	/***********************************************************************************************
 	 * 
@@ -229,20 +252,20 @@ public class Restful {
 		try {
 			tx = session.beginTransaction();
 			Session sess = HibernateUtil.getSessionFactory().openSession();
-			
-			
+
+
 			User user =  (User) sess.get(User.class, rr.getUserId());
 			App app = (App) sess.get(App.class, rr.getAppId());
-			
+
 			Query query = sess.getNamedQuery("findRatingByID");
 			query.setParameter("aID", rr.getAppId());
 			query.setParameter("uID", rr.getUserId());
-			
+
 			List<Rating> ratings = query.list();
-			
+
 			int size = ratings.size();
 			System.out.println("Länge: " + size);
-			
+
 			if (size == 0) {
 				Rating rating = new Rating();
 				rating.setUser(user);
@@ -258,7 +281,7 @@ public class Restful {
 				rating.setRatingScore(rr.getRating());
 				session.update(rating);
 			}
-			
+
 			tx.commit();
 		}
 		catch (Exception e) {
@@ -270,6 +293,53 @@ public class Restful {
 		}
 		return Response.status(201).entity(" erstellt").build();
 	}
+
+	/*
+	 * Speichert eine neues Rating
+	 * 
+	 * Test String: {"appName":"Name", "userOwnApp:"bla bla"}
+	 * Hilfe: http://www.journaldev.com/3481/hibernate-save-vs-saveorupdate-vs-persist-vs-merge-vs-update-explanation-with-examples
+	 * URL:147.87.116.78:8080/RatingAppF/rest/Restful/rating
+	 * JSON: {"userId": 4, "appId": 81,  "rating":3, "posComment": "comment xy", "negComment": "comment ab"}
+	 */
+	@DELETE
+	@Path("/rating")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response deleteRating(deleteRatingRequest rr){
+		Session session = SessionFactoryService.getSessionFactory().openSession();
+		org.hibernate.Transaction tx;
+		try {
+			tx = session.beginTransaction();
+			Session sess = HibernateUtil.getSessionFactory().openSession();
+
+
+			User user =  (User) sess.get(User.class, rr.getUserId());
+			App app = (App) sess.get(App.class, rr.getAppId());
+
+			Query query = sess.getNamedQuery("findRatingByID");
+			query.setParameter("aID", rr.getAppId());
+			query.setParameter("uID", rr.getUserId());
+
+			List<Rating> ratings = query.list();
+
+			int size = ratings.size();
+			System.out.println("Länge: " + size);
+			session.delete(ratings.get(0));
+
+
+			tx.commit();
+		}
+		catch (Exception e) {
+			System.out.println(e);
+			return Response.status(500).entity("failed").build();
+		}
+		finally {
+			session.close();
+		}
+		return Response.status(201).entity("ok").build();
+	}
+
+
 
 	/*
 	 * Speichert die Punktzahlen. Erwartet wir die App ID im Request
@@ -316,8 +386,8 @@ public class Restful {
 		Gson gson = new Gson();
 		Session session = SessionFactoryService.getSessionFactory().openSession();
 		List<App> apps = session.createQuery("FROM App").list();
-		
-	
+
+
 		session.close();
 		System.out.println("Unsortiert: ");
 
@@ -336,6 +406,29 @@ public class Restful {
 		this.appList = appList;
 	}
 
+//	@GET
+//	@Produces(MediaType.APPLICATION_JSON)
+//	@Path("ratings/app/{appId}")
+//	public Set<Rating> getRatedAppsByUser(@PathParam("appId") Integer appId) {
+//		Session sess = HibernateUtil.getSessionFactory().openSession();
+//		//org.hibernate.Transaction tx;
+//		//tx = sess.beginTransaction();
+//		App myApp = null;
+//		Set<Rating> myRatings = null;
+//		try {
+//	 		myApp = (App) sess.get(App.class, appId);
+//	 		myRatings = myApp.getRatings();
+//		 //tx.commit();
+//		} catch (Exception e) {
+//	 		System.out.println(e);
+//		}
+//		finally {
+//			sess.close();
+//		}
+//		return myRatings;
+//	}
+	
+	
 	/***********************************************************************************************
 	 * 
 	 * 
@@ -419,9 +512,26 @@ public class Restful {
 	 * 
 	 * http://localhost:8080/RatingAppF/rest/Restful/say
 	 ************************************************************************************************/
-	
-	
-	
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("ratings/apps/user/{userId}")
+	public Set<Rating> getRatedAppsByUser2(@PathParam("userId") Integer userId) {
+		Session sess = HibernateUtil.getSessionFactory().openSession();
+		User myUser = null;
+		Set<Rating> myRatings = null;
+		try {
+	 		myUser = (User) sess.get(User.class, userId);
+	 		myRatings = myUser.getRatings();
+		} catch (Exception e) {
+	 		System.out.println(e);
+		}
+		finally {
+			sess.close();
+		}
+		return myRatings;
+	}
+
 	/***********************************************************************************************
 	 * 
 	 * 
@@ -451,36 +561,28 @@ public class Restful {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("apps")
-	public Set<RatedUserApps> getRatedApps() {
-		RatedUserApps myApp = new RatedUserApps();
-		myApp.setAppId(59);
-		myApp.setAppName("Stefan59");
-		myApp.setNumberOfRatings(1);
-		myApp.setRatingAvg(4.5);
-		RatedUserApps myApp2 = new RatedUserApps();
-		myApp2.setAppId(57);
-		myApp2.setAppName("Patrick57");
-		myApp2.setNumberOfRatings(1);
-		myApp2.setRatingAvg(4.5);
-		Set<RatedUserApps> ratedApp = new HashSet<RatedUserApps>();
-		ratedApp.add(myApp);
-		ratedApp.add(myApp2);
-		return ratedApp;
+	public List<App> getRatedApps() {
+		Session session = SessionFactoryService.getSessionFactory().openSession();
+		List<App> apps = session.createQuery("FROM App").list();
 	
+		
+		
+		return apps;
+
 	}
-//	@GET
-//	@Produces(MediaType.APPLICATION_JSON)
-//	@Path("ratings/app/{appId}")
-//	public Set<RatedApp> getRatedApp(@PathParam("appId") Integer appId) {
-//		RatedApp myApp = new RatedApp();
-//		myApp.setAppId(appId);
-//		myApp.setAppName("Stefan59");
-//		myApp.setNumberOfRatings(1);
-//		myApp.setRatingAvg(4.5);
-//		
-//		
-//		
-//		return myApps;
-//	}
+	//	@GET
+	//	@Produces(MediaType.APPLICATION_JSON)
+	//	@Path("ratings/app/{appId}")
+	//	public Set<RatedApp> getRatedApp(@PathParam("appId") Integer appId) {
+	//		RatedApp myApp = new RatedApp();
+	//		myApp.setAppId(appId);
+	//		myApp.setAppName("Stefan59");
+	//		myApp.setNumberOfRatings(1);
+	//		myApp.setRatingAvg(4.5);
+	//		
+	//		
+	//		
+	//		return myApps;
+	//	}
 
 }

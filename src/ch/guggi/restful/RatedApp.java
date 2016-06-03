@@ -30,6 +30,4 @@ public class RatedApp {
 	public void setRatingValue(float ratingValue) {
 		this.ratingValue = ratingValue;
 	}
-	
-	
 }
